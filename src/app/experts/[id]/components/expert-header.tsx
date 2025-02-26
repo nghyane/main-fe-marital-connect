@@ -28,7 +28,7 @@ export const ExpertHeader = memo(function ExpertHeader({
                     <div className="flex-grow">
                         <div className="flex items-center gap-3 mb-2">
                             <h1 className={`${bricolageFont.className} text-3xl font-bold text-primary`}>
-                                    
+                                {user.name}
                             </h1>
                             <span className="px-3 py-1 text-sm font-medium bg-green-100 text-green-700 rounded-full flex items-center gap-1">
                                 <CheckCircle2 className="w-4 h-4" />
