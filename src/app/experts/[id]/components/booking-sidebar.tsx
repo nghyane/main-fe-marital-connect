@@ -5,15 +5,17 @@ import { Card, CardContent } from "@/components/ui/card";
 import { Button } from "@/components/ui/button";
 import { ClockIcon, Mail, CheckCircle, Calendar } from "lucide-react";
 import { bricolageFont } from "@/utils/fonts";
-import { Expert } from '../type';
 import { useRouter } from 'next/navigation';
 import { cn } from "@/lib/utils";
 import { Separator } from "@/components/ui/separator";
+import { useExpert } from '../context';
 
-type BookingSidebarProps = Pick<Expert, 'services' | 'user_id'> & { email?: string };
-
-export const BookingSidebar = memo(function BookingSidebar({ services, user_id, email }: BookingSidebarProps) {
+export const BookingSidebar = memo(function BookingSidebar() {
     const router = useRouter();
+    const expert = useExpert();
+    
+    const { services, user_id } = expert;
+    const email = expert.user.email;
 
     return (
         <Card className="sticky top-6">

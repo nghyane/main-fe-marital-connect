@@ -6,16 +6,12 @@ import { Card, CardContent } from "@/components/ui/card";
 import { Separator } from "@/components/ui/separator";
 import { Heart, GraduationCap, MessageCircle, Award, StarIcon } from "lucide-react";
 import { bricolageFont } from "@/utils/fonts";
-import { Expert } from '../type';
+import { useExpert } from '../context';
 
-type ExpertTabsProps = Pick<Expert, 'about' | 'specialties' | 'education' | 'certifications'>;
 
-export const ExpertTabs = memo(function ExpertTabs({
-    about,
-    specialties,
-    education,
-    certifications
-}: ExpertTabsProps) {
+export const ExpertTabs = memo(function ExpertTabs() {
+    const { about, specialties, education, certifications } = useExpert();
+
     return (
         <Tabs defaultValue="about" className="w-full">
             <TabsList className="w-full justify-start mb-6">

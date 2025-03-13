@@ -4,17 +4,12 @@ import { memo } from 'react';
 import { CheckCircle2, StarIcon, MapPinIcon, ClockIcon } from 'lucide-react';
 import { Card, CardContent } from "@/components/ui/card";
 import { bricolageFont } from "@/utils/fonts";
-import { Expert } from '../type';
 import { getAvailabilityStatusText } from '@/utils/availability-status';
-type ExpertHeaderProps = Pick<Expert, 'title' | 'location' | 'experience' | 'availability_status' | 'user'>;
+import { useExpert } from '../context';
 
-export const ExpertHeader = memo(function ExpertHeader({
-    title,
-    location,
-    experience,
-    availability_status,
-    user
-}: ExpertHeaderProps) {
+export const ExpertHeader = memo(function ExpertHeader() {
+    const expert = useExpert();
+    const { title, location, experience, availability_status, user } = expert;
     
     return (
         <Card>
@@ -45,6 +40,7 @@ export const ExpertHeader = memo(function ExpertHeader({
                             <div className="flex items-center gap-1">
                                 <MapPinIcon className="w-4 h-4" />
                                 <span>{location}</span>
+
                             </div>
                             <div className="flex items-center gap-1">
                                 <ClockIcon className="w-4 h-4" />

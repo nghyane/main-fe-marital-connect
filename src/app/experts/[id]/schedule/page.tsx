@@ -20,6 +20,7 @@ export default async function ScheduleAppointmentPage({
 }: PageProps) {
   const { id } = await params;
 
+
   return (
     <main className="min-h-screen bg-muted/10">
         <div className="container mx-auto px-4 py-12">
