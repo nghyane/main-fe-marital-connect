@@ -110,6 +110,7 @@ interface CreatePaymentPayload {
   appointmentId: number;
   returnUrl: string;
   cancelUrl: string;
+  description: string;
 }
 
 interface CreatePaymentResponse {
@@ -134,7 +135,7 @@ export async function createPayment(
     // Convert payload to a plain object that satisfies Record<string, unknown>
     const requestBody = {
       appointmentId: payload.appointmentId,
-      description: "Thanh toan lich hen - " + payload.appointmentId,
+      description: payload.description,
       returnUrl: payload.returnUrl,
       cancelUrl: payload.cancelUrl
     };

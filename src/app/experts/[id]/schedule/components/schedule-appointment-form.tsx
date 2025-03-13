@@ -274,17 +274,18 @@ export function ScheduleAppointmentForm({ expertId }: ScheduleAppointmentFormPro
     try {
       setIsSubmitting(true);
       
-      // Get the current URL for return and cancel URLs
       const baseUrl = window.location.origin;
-      const returnUrl = `${baseUrl}/dashboard/appointments?status=success`;
-      const cancelUrl = `${baseUrl}/dashboard/appointments?status=cancelled`;
-      
+
+      const returnUrl = `${baseUrl}/dashboard/appointments`;
+      const cancelUrl = `${baseUrl}/dashboard/appointments`;
+      const description = "Thanh toan lich hen - " + appointmentId;
       
       // Create payment payload
       const paymentPayload = {
         appointmentId: appointmentId,
         returnUrl,
-        cancelUrl
+        cancelUrl,
+        description
       };
       
       // Call server action to create payment
