@@ -4,18 +4,17 @@ import { RecentAppointments } from "./components/recent-appointments"
 import { Button } from "@/components/ui/button"
 import { CalendarDays, ArrowRight, Clock } from "lucide-react"
 import Link from "next/link"
+import { getProfile } from "@/app/actions/user"
+import { WelcomeHeader } from "./components/welcome-header"
 
-export default function DashboardPage() {
+export default async function DashboardPage() {
+  const user = (await getProfile()).data;
+  
   return (
     <div className="space-y-6">
-      <div>
-        <h1 className="text-2xl font-semibold tracking-tight md:text-3xl">
-          Welcome back, John
-        </h1>
-        <p className="text-sm text-muted-foreground md:text-base">
-          Here's an overview of your mentoring journey
-        </p>
-      </div>
+      <WelcomeHeader 
+        name={user.name} 
+      />
 
       <DashboardStats />
       

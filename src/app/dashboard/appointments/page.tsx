@@ -4,6 +4,7 @@ import { Button } from "@/components/ui/button"
 import { Plus } from "lucide-react"
 import { Shell } from "@/components/shell"
 import { AppointmentTabs } from "./components/appointment-tabs"
+import Link from "next/link"
 
 export const metadata: Metadata = {
   title: "Appointments | Dashboard",
@@ -17,7 +18,7 @@ interface AppointmentsPageProps {
 export default async function AppointmentsPage({
   searchParams,
 }: AppointmentsPageProps) {
-  // Await and handle tab value on server
+
   const params = await searchParams
   const defaultTab = params.tab === 'past' || params.tab === 'calendar' 
     ? params.tab 
@@ -33,10 +34,12 @@ export default async function AppointmentsPage({
               Schedule and manage your upcoming sessions
             </p>
           </div>
-          <Button className="gap-2">
-            <Plus className="h-4 w-4" />
-            Book New Session
-          </Button>
+          <Link href="/">
+            <Button className="gap-2">
+              <Plus className="h-4 w-4" />
+              Book New Session
+            </Button>
+          </Link>
         </div>
 
         <Card className="p-6">

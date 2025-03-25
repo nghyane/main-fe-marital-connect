@@ -7,6 +7,7 @@ import { AUTH_COOKIES } from "@/constants/auth";
 import { Toaster } from "@/components/ui/sonner";
 import { Suspense } from 'react';
 import { Loading } from "@/components/ui/loading";
+import { ToastContainer } from '@/components/ui/toast'
 
 export const metadata: Metadata = {
   title: "Marriage Advice",
@@ -34,7 +35,9 @@ export default async function RootLayout({
               minHeight="min-h-[80px]"
             />
           }>
-            {children}
+            <ToastContainer>
+              {children}
+            </ToastContainer>
           </Suspense>
           <Suspense>
             <Toaster />

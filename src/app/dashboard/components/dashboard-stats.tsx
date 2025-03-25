@@ -1,7 +1,17 @@
 import { Card } from "@/components/ui/card"
 import { Clock, Star, Video, TrendingUp } from "lucide-react"
+import { getProfile } from "@/app/actions/user"
 
-export function DashboardStats() {
+export async function DashboardStats() {
+  const userData = await getProfile();
+  const user = userData.data;
+  
+  // Ở đây bạn có thể sử dụng dữ liệu từ user để hiển thị thống kê thực tế
+  // Ví dụ: số buổi hẹn, đánh giá, v.v.
+  
+  // Default language if profile is null
+  const language = user.profile?.preferences?.language || 'en';
+  
   return (
     <div className="grid gap-4 md:grid-cols-4">
       <Card className="p-4">
@@ -44,7 +54,7 @@ export function DashboardStats() {
         </div>
         <p className="text-2xl font-bold mt-2">85%</p>
         <p className="text-xs text-muted-foreground mt-1">
-          Based on milestones
+          Based on {language === 'en' ? 'English' : 'Other'} milestones
         </p>
       </Card>
     </div>

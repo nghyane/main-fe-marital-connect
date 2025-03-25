@@ -117,7 +117,7 @@ export function AuthProvider({
         duration: 3000,
       });
 
-      router.push(ROUTES.HOME);
+      router.push('/dashboard/profile');
     }, 'An error occurred during registration');
   }, [withAsyncOperation]);
   

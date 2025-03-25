@@ -37,6 +37,9 @@ export function middleware(request: NextRequest) {
   response.headers.set('X-Content-Type-Options', 'nosniff');
   response.headers.set('Referrer-Policy', 'strict-origin-when-cross-origin');
 
+  const currentPath = request.nextUrl.pathname;
+  response.headers.set('x-current-path', currentPath);
+  
   return response;
 }
 

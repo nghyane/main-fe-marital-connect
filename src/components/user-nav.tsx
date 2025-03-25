@@ -11,26 +11,34 @@ import {
   DropdownMenuSeparator,
   DropdownMenuTrigger,
 } from "@/components/ui/dropdown-menu"
-import { CreditCard, LogOut, Settings, User } from "lucide-react"
+import { User, CreditCard, Settings, LogOut } from "lucide-react"
 import Link from "next/link"
+import { useUser } from "@/app/dashboard/provider"
+import { useAuth } from '@/providers/auth-provider';
 
 export function UserNav() {
+  const { user } = useUser();
+  const { logout } = useAuth();
+  console.log('user', user);
   return (
     <DropdownMenu>
       <DropdownMenuTrigger asChild>
         <Button variant="ghost" className="relative h-8 w-8 rounded-full">
           <Avatar className="h-8 w-8">
-            <AvatarImage src="https://api.dicebear.com/7.x/avataaars/svg?seed=John" alt="@john" />
-            <AvatarFallback>JD</AvatarFallback>
+            <AvatarImage 
+              src={user.profile?.profile_image} 
+              alt="@user" 
+            />
+            <AvatarFallback>{user.name.charAt(0)}</AvatarFallback>
           </Avatar>
         </Button>
       </DropdownMenuTrigger>
       <DropdownMenuContent className="w-56" align="end" forceMount>
         <DropdownMenuLabel className="font-normal">
           <div className="flex flex-col space-y-1">
-            <p className="text-sm font-medium leading-none">John Doe</p>
+            <p className="text-sm font-medium leading-none">{user.name}</p>
             <p className="text-xs leading-none text-muted-foreground">
-              john@example.com
+              {user.email}
             </p>
           </div>
         </DropdownMenuLabel>
@@ -56,7 +64,7 @@ export function UserNav() {
           </DropdownMenuItem>
         </DropdownMenuGroup>
         <DropdownMenuSeparator />
-        <DropdownMenuItem className="cursor-pointer">
+        <DropdownMenuItem className="cursor-pointer" onClick={logout}>
           <LogOut className="mr-2 h-4 w-4" />
           <span>Log out</span>
         </DropdownMenuItem>
