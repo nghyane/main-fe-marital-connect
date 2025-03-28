@@ -13,7 +13,6 @@ export const metadata: Metadata = {
   description: "Manage your appointments and profile"
 }
 
-
 export default async function DashboardLayout({
   children,
 }: {
@@ -21,7 +20,10 @@ export default async function DashboardLayout({
 }) {
   const user = await getProfile();
 
-
+  // Redirect if no user or invalid role
+  if (!user?.data || !['user', 'expert'].includes(user.data.role.name)) {
+    redirect('/login');
+  }
 
   return (
     <UserProvider initialUser={user}>
@@ -40,5 +42,4 @@ export default async function DashboardLayout({
       </div>
     </UserProvider>
   )
-
 }

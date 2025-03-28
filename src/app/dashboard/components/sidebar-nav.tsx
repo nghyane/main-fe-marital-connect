@@ -5,10 +5,11 @@ import { usePathname } from "next/navigation"
 import { cn } from "@/lib/utils"
 import { buttonVariants } from "@/components/ui/button"
 import { LayoutDashboard, Calendar, User, Settings, LogOut } from "lucide-react"
+import { useUser } from "../provider"
 
 interface SidebarNavProps extends React.HTMLAttributes<HTMLElement> {}
 
-const menuItems = [
+const userMenuItems = [
   {
     title: "Overview",
     href: "/dashboard",
@@ -26,8 +27,34 @@ const menuItems = [
   },
 ]
 
+const expertMenuItems = [
+  {
+    title: "Overview",
+    href: "/dashboard",
+    icon: LayoutDashboard,
+  },
+  {
+    title: "Sessions",
+    href: "/dashboard/appointments",
+    icon: Calendar,
+  },
+  {
+    title: "Profile",
+    href: "/dashboard/profile",
+    icon: User,
+  },
+  {
+    title: "Assessment",
+    href: "/dashboard/assessment",
+    icon: Calendar,
+  },
+]
+
 export function SidebarNav({ className, ...props }: SidebarNavProps) {
   const pathname = usePathname()
+  const { user } = useUser()
+  const isExpert = user.role.name === 'expert'
+  const menuItems = isExpert ? expertMenuItems : userMenuItems
 
   return (
     <nav
