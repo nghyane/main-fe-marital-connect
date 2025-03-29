@@ -51,7 +51,7 @@ export async function saveProfile(formData: ProfileFormData): Promise<{ success:
     }
 
     const response = await fetch(`${process.env.NEXT_PUBLIC_API_URL}/profile`, {
-      method: 'POST',
+      method: 'PUT',
       headers: {
         'Authorization': `Bearer ${token.value}`,
         'Content-Type': 'application/json',
