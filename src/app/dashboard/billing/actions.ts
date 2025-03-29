@@ -61,7 +61,7 @@ export async function getPaymentHistory(): Promise<TransactionDataForUI[]> {
         id: `TX-${payment.id}`,
         description: payment.serviceName,
         date: formattedDate,
-        amount: (payment.amount / 100).toFixed(2), // Assuming amount is in cents
+        amount: (payment.amount).toFixed(2), 
         type: isRefund ? 'credit' : 'debit',
         status: payment.status,
         paymentMethod: formatPaymentMethod(payment.payment_method),

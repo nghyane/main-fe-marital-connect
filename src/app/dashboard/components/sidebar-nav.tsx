@@ -4,7 +4,7 @@ import Link from "next/link"
 import { usePathname } from "next/navigation"
 import { cn } from "@/lib/utils"
 import { buttonVariants } from "@/components/ui/button"
-import { LayoutDashboard, Calendar, User, Settings, LogOut, ClipboardList, Users, Award, HelpCircle, Wallet } from "lucide-react"
+import { LayoutDashboard, Calendar, User, Settings, LogOut, ClipboardList, Users, Award, HelpCircle, Wallet, CalendarDays } from "lucide-react"
 import { useUser } from "../provider"
 import { useAuth } from "@/providers/auth-provider"
 

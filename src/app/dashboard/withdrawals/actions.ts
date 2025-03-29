@@ -3,15 +3,27 @@
 import { api } from '@/lib/api-client';
 import { revalidatePath } from 'next/cache';
 
+/**
+ * Format returned by the API
+ */
 export interface ExpertBalance {
   success: boolean;
   message: string;
   data: {
-    balance: number;
+    totalBalance: number;
     pendingWithdrawals: number;
-    available: number;
-    currency: string;
+    availableForWithdrawal: number;
   };
+}
+
+/**
+ * Format expected by components
+ */
+export interface ExpertBalanceData {
+  balance: number;
+  pendingWithdrawals: number;
+  available: number;
+  currency: string;
 }
 
 export interface WithdrawalHistory {
@@ -28,7 +40,12 @@ export interface Withdrawal {
   status: 'pending' | 'completed' | 'failed';
   created_at: string;
   completed_at?: string;
-  bank_account: {
+  // The API might return these fields directly rather than nested
+  bank_name?: string;
+  bank_account?: string;
+  account_holder?: string;
+  // Or it might return them nested
+  bank_account_details?: {
     bank_name: string;
     account_number: string;
     account_name: string;
@@ -47,23 +64,20 @@ export interface WithdrawalDataForUI {
 }
 
 /**
- * Get the current expert's balance
- * Temporarily using mock data until API endpoint is available
+ * API response for withdrawal request
  */
-export async function getExpertBalance(): Promise<ExpertBalance['data']> {
-  // Mock data since endpoint doesn't exist yet
-  // In a real application, this would be an API call
-  return {
-    balance: 325000, // $3,250.00
-    pendingWithdrawals: 75000, // $750.00
-    available: 250000, // $2,500.00
-    currency: 'USD'
-  };
-  
-  // Original implementation - keep for when API is ready
-  /*
+export interface WithdrawalRequestResponse {
+  success: boolean;
+  message: string;
+  data?: any;
+}
+
+/**
+ * Get the current expert's balance
+ */
+export async function getExpertBalance(): Promise<ExpertBalanceData> {
   try {
-    const response = await api.fetch<ExpertBalance>('/expert/balance', {
+    const response = await api.fetch<ExpertBalance>('/experts/financial', {
       auth: true,
       cache: 'no-store'
     });
@@ -72,7 +86,13 @@ export async function getExpertBalance(): Promise<ExpertBalance['data']> {
       throw new Error(response.message || 'Failed to fetch balance');
     }
 
-    return response.data;
+    // Map the API response to the format expected by components
+    return {
+      balance: response.data.totalBalance, 
+      pendingWithdrawals: response.data.pendingWithdrawals,
+      available: response.data.availableForWithdrawal,
+      currency: 'USD'
+    };
   } catch (error) {
     console.error('Error fetching expert balance:', error);
     return {
@@ -82,77 +102,14 @@ export async function getExpertBalance(): Promise<ExpertBalance['data']> {
       currency: 'USD'
     };
   }
-  */
 }
 
 /**
  * Get withdrawal history for the expert
- * Temporarily using mock data until API endpoint is available
  */
 export async function getWithdrawalHistory(): Promise<WithdrawalDataForUI[]> {
-  // Mock data since endpoint doesn't exist yet
-  const mockWithdrawals = [
-    {
-      id: 1,
-      amount: 150000, // $1,500.00
-      status: 'completed' as const,
-      created_at: '2024-02-15T10:30:00Z',
-      completed_at: '2024-02-17T14:20:00Z',
-      bank_account: {
-        bank_name: 'VietCombank',
-        account_number: '1234567890123',
-        account_name: 'Nguyen Van A'
-      }
-    },
-    {
-      id: 2,
-      amount: 75000, // $750.00
-      status: 'pending' as const,
-      created_at: '2024-03-10T08:45:00Z',
-      bank_account: {
-        bank_name: 'TPBank',
-        account_number: '9876543210987',
-        account_name: 'Nguyen Van A'
-      }
-    }
-  ];
-
-  // Map mock data to UI format
-  return mockWithdrawals.map(withdrawal => {
-    // Format date string
-    const requestDate = new Date(withdrawal.created_at);
-    const formattedRequestDate = requestDate.toLocaleDateString('en-US', {
-      month: 'short',
-      day: 'numeric',
-      year: 'numeric'
-    });
-
-    let formattedCompletedDate = undefined;
-    if (withdrawal.completed_at) {
-      const completedDate = new Date(withdrawal.completed_at);
-      formattedCompletedDate = completedDate.toLocaleDateString('en-US', {
-        month: 'short',
-        day: 'numeric',
-        year: 'numeric'
-      });
-    }
-    
-    return {
-      id: `WD-${withdrawal.id}`,
-      amount: (withdrawal.amount / 100).toFixed(2),
-      status: withdrawal.status,
-      requestDate: formattedRequestDate,
-      completedDate: formattedCompletedDate,
-      bankName: withdrawal.bank_account.bank_name,
-      accountNumber: withdrawal.bank_account.account_number,
-      accountName: withdrawal.bank_account.account_name
-    };
-  });
-  
-  // Original implementation - keep for when API is ready
-  /*
   try {
-    const response = await api.fetch<WithdrawalHistory>('/expert/withdrawals', {
+    const response = await api.fetch<WithdrawalHistory>('/experts/withdrawals', {
       auth: true,
       cache: 'no-store'
     });
@@ -180,32 +137,32 @@ export async function getWithdrawalHistory(): Promise<WithdrawalDataForUI[]> {
           year: 'numeric'
         });
       }
-      
+
+      // Based on the curl response, the API returns a flat structure
+      // with account_holder, bank_account, and bank_name directly on the withdrawal object
       return {
         id: `WD-${withdrawal.id}`,
-        amount: (withdrawal.amount / 100).toFixed(2),
+        amount: (withdrawal.amount).toFixed(2),
         status: withdrawal.status,
         requestDate: formattedRequestDate,
         completedDate: formattedCompletedDate,
-        bankName: withdrawal.bank_account.bank_name,
-        accountNumber: withdrawal.bank_account.account_number,
-        accountName: withdrawal.bank_account.account_name
+        bankName: withdrawal.bank_name || '',
+        accountNumber: withdrawal.bank_account || '',
+        accountName: withdrawal.account_holder || ''
       };
     });
   } catch (error) {
     console.error('Error fetching withdrawal history:', error);
     return [];
   }
-  */
 }
 
 /**
  * Submit a withdrawal request
- * Currently using mock implementation until API endpoint is available
  */
 export async function requestWithdrawal(formData: FormData) {
   try {
-    const amount = parseFloat(formData.get('amount') as string) * 100; // Convert to cents
+    const amount = parseFloat(formData.get('amount') as string); // Don't convert to cents anymore
     const bankName = formData.get('bankName') as string;
     const accountNumber = formData.get('accountNumber') as string;
     const accountName = formData.get('accountName') as string;
@@ -219,17 +176,21 @@ export async function requestWithdrawal(formData: FormData) {
       throw new Error('Please provide all bank account details');
     }
     
-    // Mock implementation - simulate API call delay
-    await new Promise(resolve => setTimeout(resolve, 1000));
-    
-    console.log('Withdrawal request submitted:', {
-      amount,
-      bank_account: {
+    const response = await api.fetch<WithdrawalRequestResponse>('/experts/withdrawals', {
+      method: 'POST',
+      auth: true,
+      body: {
+        amount,
+        bank_account: accountNumber,
         bank_name: bankName,
-        account_number: accountNumber,
-        account_name: accountName
+        account_holder: accountName,
+        notes: "" // Optional notes field
       }
     });
+
+    if (!response.success) {
+      throw new Error(response.message || 'Failed to submit withdrawal request');
+    }
     
     revalidatePath('/dashboard/withdrawals');
     
@@ -237,26 +198,8 @@ export async function requestWithdrawal(formData: FormData) {
       success: true,
       message: 'Withdrawal request submitted successfully'
     };
-    
-    // Original implementation - keep for when API is ready
-    /*
-    const response = await api.fetch('/expert/withdrawals/request', {
-      method: 'POST',
-      body: {
-        amount,
-        bank_account: {
-          bank_name: bankName,
-          account_number: accountNumber,
-          account_name: accountName
-        }
-      },
-      auth: true
-    });
-
-    return response;
-    */
-  } catch (error) {
-    console.error('Error requesting withdrawal:', error);
-    throw error;
+  } catch (error: any) {
+    console.error('Error submitting withdrawal request:', error);
+    throw new Error(error.message || 'Failed to submit withdrawal request');
   }
 } 

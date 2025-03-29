@@ -17,48 +17,63 @@ import { Input } from "@/components/ui/input"
 import { Textarea } from "@/components/ui/textarea"
 import { Separator } from "@/components/ui/separator"
 import { Switch } from "@/components/ui/switch"
+import { saveProfile, ProfileFormData } from "@/app/actions/user"
+import { User } from "@/types/user"
+import { useState } from "react"
+import { useRouter } from "next/navigation"
+import { toast } from "sonner"
 
 const profileFormSchema = z.object({
-  username: z.string()
-    .min(3, "Username must be at least 3 characters")
-    .max(20, "Username must not exceed 20 characters")
-    .regex(/^[a-z0-9_-]+$/, "Username can only contain letters, numbers, underscores and dashes"),
   name: z.string()
     .min(2, "Name must be at least 2 characters")
     .max(50, "Name must not exceed 50 characters"),
-  email: z.string()
-    .email("Please enter a valid email address"),
   bio: z.string()
     .max(500, "Bio must not exceed 500 characters")
     .optional(),
-  location: z.string()
-    .max(100, "Location must not exceed 100 characters")
-    .optional(),
-  website: z.string()
-    .url("Please enter a valid URL")
-    .optional()
-    .or(z.literal("")),
-  available: z.boolean().default(false),
+  phone: z.string().optional(),
+  address: z.string().optional(),
+  city: z.string().optional(),
+  state: z.string().optional(),
+  country: z.string().optional(),
+  postal_code: z.string().optional(),
 })
 
 type ProfileFormValues = z.infer<typeof profileFormSchema>
 
-export function ProfileForm() {
+export function ProfileForm({ user }: { user: User }) {
+  const [isSubmitting, setIsSubmitting] = useState(false)
+  const router = useRouter()
+  
   const form = useForm<ProfileFormValues>({
     resolver: zodResolver(profileFormSchema),
     defaultValues: {
-      username: "",
-      name: "",
-      email: "",
-      bio: "",
-      location: "",
-      website: "",
-      available: false,
+      name: user.name || "",
+      bio: user.profile?.bio || "",
+      phone: user.profile?.phone || "",
+      address: user.profile?.address || "",
+      city: user.profile?.city || "",
+      state: user.profile?.state || "",
+      country: user.profile?.country || "",
+      postal_code: user.profile?.postal_code || "",
     },
   })
 
-  function onSubmit(data: ProfileFormValues) {
-    console.log(data)
+  async function onSubmit(data: ProfileFormValues) {
+    try {
+      setIsSubmitting(true)
+      const result = await saveProfile(data as ProfileFormData)
+      
+      if (result.success) {
+        toast.success(result.message)
+        router.refresh()
+      } else {
+        toast.error(result.message)
+      }
+    } catch (error) {
+      toast.error("Something went wrong. Please try again.")
+    } finally {
+      setIsSubmitting(false)
+    }
   }
 
   return (
@@ -72,91 +87,20 @@ export function ProfileForm() {
             </p>
           </div>
           <Separator />
-
+          
           <FormField
             control={form.control}
-            name="available"
+            name="name"
             render={({ field }) => (
-              <FormItem className="flex flex-row items-center justify-between rounded-lg border p-4">
-                <div className="space-y-0.5">
-                  <FormLabel className="text-base">Available for Hire</FormLabel>
-                  <FormDescription>
-                    Display an available badge on your profile
-                  </FormDescription>
-                </div>
+              <FormItem>
+                <FormLabel>Full Name</FormLabel>
                 <FormControl>
-                  <Switch
-                    checked={field.value}
-                    onCheckedChange={field.onChange}
-                  />
+                  <Input {...field} />
                 </FormControl>
+                <FormMessage />
               </FormItem>
             )}
           />
-          
-          <div className="grid gap-4 sm:grid-cols-2">
-            <FormField
-              control={form.control}
-              name="username"
-              render={({ field }) => (
-                <FormItem>
-                  <FormLabel>Username</FormLabel>
-                  <FormControl>
-                    <Input placeholder="johndoe" {...field} />
-                  </FormControl>
-                  <FormDescription>
-                    This is your public display name
-                  </FormDescription>
-                  <FormMessage />
-                </FormItem>
-              )}
-            />
-
-            <FormField
-              control={form.control}
-              name="email"
-              render={({ field }) => (
-                <FormItem>
-                  <FormLabel>Email</FormLabel>
-                  <FormControl>
-                    <Input type="email" {...field} />
-                  </FormControl>
-                  <FormDescription>
-                    Your email address
-                  </FormDescription>
-                  <FormMessage />
-                </FormItem>
-              )}
-            />
-
-            <FormField
-              control={form.control}
-              name="name"
-              render={({ field }) => (
-                <FormItem>
-                  <FormLabel>Full Name</FormLabel>
-                  <FormControl>
-                    <Input {...field} />
-                  </FormControl>
-                  <FormMessage />
-                </FormItem>
-              )}
-            />
-
-            <FormField
-              control={form.control}
-              name="location"
-              render={({ field }) => (
-                <FormItem>
-                  <FormLabel>Location</FormLabel>
-                  <FormControl>
-                    <Input placeholder="San Francisco, CA" {...field} />
-                  </FormControl>
-                  <FormMessage />
-                </FormItem>
-              )}
-            />
-          </div>
 
           <FormField
             control={form.control}
@@ -179,27 +123,99 @@ export function ProfileForm() {
             )}
           />
 
-          <FormField
-            control={form.control}
-            name="website"
-            render={({ field }) => (
-              <FormItem>
-                <FormLabel>Website</FormLabel>
-                <FormControl>
-                  <Input placeholder="https://example.com" {...field} />
-                </FormControl>
-                <FormMessage />
-              </FormItem>
-            )}
-          />
+          <div className="grid gap-4 sm:grid-cols-2">
+            <FormField
+              control={form.control}
+              name="phone"
+              render={({ field }) => (
+                <FormItem>
+                  <FormLabel>Phone</FormLabel>
+                  <FormControl>
+                    <Input {...field} />
+                  </FormControl>
+                  <FormMessage />
+                </FormItem>
+              )}
+            />
+
+            <FormField
+              control={form.control}
+              name="address"
+              render={({ field }) => (
+                <FormItem>
+                  <FormLabel>Address</FormLabel>
+                  <FormControl>
+                    <Input {...field} />
+                  </FormControl>
+                  <FormMessage />
+                </FormItem>
+              )}
+            />
+
+            <FormField
+              control={form.control}
+              name="city"
+              render={({ field }) => (
+                <FormItem>
+                  <FormLabel>City</FormLabel>
+                  <FormControl>
+                    <Input {...field} />
+                  </FormControl>
+                  <FormMessage />
+                </FormItem>
+              )}
+            />
+
+            <FormField
+              control={form.control}
+              name="state"
+              render={({ field }) => (
+                <FormItem>
+                  <FormLabel>State</FormLabel>
+                  <FormControl>
+                    <Input {...field} />
+                  </FormControl>
+                  <FormMessage />
+                </FormItem>
+              )}
+            />
+
+            <FormField
+              control={form.control}
+              name="country"
+              render={({ field }) => (
+                <FormItem>
+                  <FormLabel>Country</FormLabel>
+                  <FormControl>
+                    <Input {...field} />
+                  </FormControl>
+                  <FormMessage />
+                </FormItem>
+              )}
+            />
+
+            <FormField
+              control={form.control}
+              name="postal_code"
+              render={({ field }) => (
+                <FormItem>
+                  <FormLabel>Postal Code</FormLabel>
+                  <FormControl>
+                    <Input {...field} />
+                  </FormControl>
+                  <FormMessage />
+                </FormItem>
+              )}
+            />
+          </div>
         </div>
 
         <div className="flex justify-end gap-4">
           <Button type="button" variant="outline">
             Cancel
           </Button>
-          <Button type="submit">
-            Save Changes
+          <Button type="submit" disabled={isSubmitting}>
+            {isSubmitting ? "Saving..." : "Save Changes"}
           </Button>
         </div>
       </form>

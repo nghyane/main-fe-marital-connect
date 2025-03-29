@@ -26,12 +26,14 @@ import { redirect } from "next/navigation"
 import { Skeleton } from "@/components/ui/skeleton"
 import { revalidatePath } from "next/cache"
 import { Badge } from "@/components/ui/badge"
+import { RequestWithdrawalButton } from "./request-withdrawal-button"
 
 export const metadata: Metadata = {
   title: "Revenue Withdrawals",
   description: "Manage your revenue and withdrawals"
 }
 
+// Server components below
 export default async function WithdrawalsPage() {
   const user = (await getProfile()).data;
   
@@ -90,7 +92,7 @@ async function BalanceOverview() {
         </CardHeader>
         <CardContent>
           <div className="text-2xl font-bold">
-            ${(balance.balance / 100).toFixed(2)}
+            ${(balance.balance).toFixed(2)}
           </div>
           <p className="text-xs text-muted-foreground">
             Your lifetime earnings
@@ -107,7 +109,7 @@ async function BalanceOverview() {
         </CardHeader>
         <CardContent>
           <div className="text-2xl font-bold">
-            ${(balance.pendingWithdrawals / 100).toFixed(2)}
+            ${(balance.pendingWithdrawals).toFixed(2)}
           </div>
           <p className="text-xs text-muted-foreground">
             Amount currently being processed
@@ -124,7 +126,7 @@ async function BalanceOverview() {
         </CardHeader>
         <CardContent>
           <div className="text-2xl font-bold">
-            ${(balance.available / 100).toFixed(2)}
+            ${(balance.available).toFixed(2)}
           </div>
           <p className="text-xs text-muted-foreground">
             Amount you can withdraw now
@@ -190,7 +192,7 @@ async function BalanceOverview() {
 
 async function WithdrawalForm() {
   const balance = await getExpertBalance();
-  const availableForWithdrawal = balance.available / 100;
+  const availableForWithdrawal = balance.available;
   
   async function handleWithdrawal(formData: FormData) {
     "use server"
@@ -319,9 +321,15 @@ async function WithdrawalHistory() {
                     )}
                   </div>
                   <div>
-                    <p className="font-medium">Withdrawal to {withdrawal.bankName}</p>
+                    <p className="font-medium">Withdrawal to {withdrawal.bankName || 'Bank'}</p>
                     <p className="text-sm text-muted-foreground">
-                      Account: {withdrawal.accountNumber.slice(0, 4)}****{withdrawal.accountNumber.slice(-4)}
+                      {withdrawal.accountNumber ? (
+                        withdrawal.accountNumber.length >= 8 ? 
+                          `Account: ${withdrawal.accountNumber.slice(0, 4)}****${withdrawal.accountNumber.slice(-4)}` :
+                          `Account: ${withdrawal.accountNumber}`
+                      ) : (
+                        'Account: Not available'
+                      )}
                     </p>
                     <div className="flex flex-wrap gap-2 items-center text-sm text-muted-foreground mt-1">
                       <div className="flex items-center gap-1">
@@ -365,17 +373,7 @@ async function WithdrawalHistory() {
             <p className="text-sm text-muted-foreground mb-4 max-w-md">
               When you request withdrawals, they will appear here. Start by requesting your first withdrawal.
             </p>
-            <Button variant="outline" className="gap-2" asChild>
-              <a href="#" onClick={(e) => {
-                e.preventDefault();
-                const tabTrigger = document.querySelector('[data-value="withdraw"]');
-                if (tabTrigger && 'click' in tabTrigger) {
-                  (tabTrigger as HTMLElement).click();
-                }
-              }}>
-                Request Your First Withdrawal
-              </a>
-            </Button>
+            <RequestWithdrawalButton />
           </div>
         </CardContent>
       )}
