@@ -11,6 +11,8 @@ import Link from "next/link"
 import { getExpertProfile } from "@/app/actions/expert"
 import { Certification } from "@/types/expert"
 import { VerificationRequestButton } from "./_components/verification-request-button"
+import { DeleteCertificationButton } from "./_components/delete-certification-button"
+import { EditCertificationButton } from "./_components/edit-certification-button"
 
 export const metadata: Metadata = {
   title: "Certifications | Expert Dashboard",
@@ -160,12 +162,11 @@ export default async function CertificationsPage() {
                       </div>
                       
                       <div className="flex items-center gap-2 md:self-start">
-                        <Button variant="ghost" size="icon">
-                          <Pencil className="h-4 w-4" />
-                        </Button>
-                        <Button variant="ghost" size="icon" className="text-destructive">
-                          <Trash2 className="h-4 w-4" />
-                        </Button>
+                        <EditCertificationButton certification={cert} />
+                        <DeleteCertificationButton 
+                          certificationId={cert.id} 
+                          certificationName={cert.name}
+                        />
                       </div>
                     </div>
                     
