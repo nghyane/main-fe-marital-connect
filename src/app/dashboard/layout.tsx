@@ -4,9 +4,7 @@ import { DashboardHeader } from "@/components/dashboard-header"
 import { Shell } from "@/components/shell"
 import { getProfile } from "@/app/actions/user"
 import { UserProvider } from "./provider"
-import { redirect } from "next/navigation"
-
-import { headers } from 'next/headers'
+import { cn } from "@/lib/utils"
 
 export const metadata: Metadata = {
   title: "Dashboard",
@@ -22,7 +20,7 @@ export default async function DashboardLayout({
 
   // Redirect if no user or invalid role
   if (!user?.data || !['user', 'expert'].includes(user.data.role.name)) {
-    redirect('/login');
+    return <div>You are not authorized to access this page</div>
   }
 
   return (

@@ -1,3 +1,5 @@
+"use client"
+
 import { UserNav } from "@/components/user-nav"
 import { ModeToggle } from "@/components/mode-toggle"
 import { Button } from "@/components/ui/button"
@@ -13,8 +15,13 @@ import {
 } from "@/components/ui/sheet"
 import { SidebarNav } from "@/app/dashboard/components/sidebar-nav"
 import { Shell } from "@/components/shell"
+import { useUser } from "@/app/dashboard/provider"
 
 export function DashboardHeader() {
+  // Get user from context
+  const { user } = useUser()
+  const isExpert = user.role.name === 'expert'
+
   return (
     <header className="sticky top-0 z-50 w-full border-b bg-background">
       <Shell variant="dashboard">
@@ -56,12 +63,23 @@ export function DashboardHeader() {
               >
                 Home
               </Link>
-              <Link 
-                href="/dashboard/appointments" 
-                className="text-sm font-medium text-muted-foreground hover:text-foreground transition-colors"
-              >
-                My Sessions
-              </Link>
+              {isExpert ? (
+                <>
+                  <Link 
+                    href="/dashboard/appointments" 
+                    className="text-sm font-medium text-muted-foreground hover:text-foreground transition-colors"
+                  >
+                    Sessions
+                  </Link>
+                </>
+              ) : (
+                <Link 
+                  href="/dashboard/appointments" 
+                  className="text-sm font-medium text-muted-foreground hover:text-foreground transition-colors"
+                >
+                  My Sessions
+                </Link>
+              )}
             </nav>
 
             <div className="ml-auto flex items-center gap-2">

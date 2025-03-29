@@ -4,8 +4,9 @@ import Link from "next/link"
 import { usePathname } from "next/navigation"
 import { cn } from "@/lib/utils"
 import { buttonVariants } from "@/components/ui/button"
-import { LayoutDashboard, Calendar, User, Settings, LogOut } from "lucide-react"
+import { LayoutDashboard, Calendar, User, Settings, LogOut, ClipboardList, Users, Award, HelpCircle, Wallet } from "lucide-react"
 import { useUser } from "../provider"
+import { useAuth } from "@/providers/auth-provider"
 
 interface SidebarNavProps extends React.HTMLAttributes<HTMLElement> {}
 
@@ -25,6 +26,11 @@ const userMenuItems = [
     href: "/dashboard/profile",
     icon: User,
   },
+  {
+    title: "Support",
+    href: "/dashboard/support",
+    icon: HelpCircle,
+  },
 ]
 
 const expertMenuItems = [
@@ -34,9 +40,19 @@ const expertMenuItems = [
     icon: LayoutDashboard,
   },
   {
-    title: "Sessions",
+    title: "Client Sessions",
     href: "/dashboard/appointments",
     icon: Calendar,
+  },
+  {
+    title: "Clients",
+    href: "/dashboard/clients",
+    icon: Users,
+  },
+  {
+    title: "Revenue Withdrawals",
+    href: "/dashboard/withdrawals",
+    icon: Wallet,
   },
   {
     title: "Profile",
@@ -44,15 +60,16 @@ const expertMenuItems = [
     icon: User,
   },
   {
-    title: "Assessment",
-    href: "/dashboard/assessment",
-    icon: Calendar,
+    title: "Certifications",
+    href: "/dashboard/certifications",
+    icon: Award,
   },
 ]
 
 export function SidebarNav({ className, ...props }: SidebarNavProps) {
   const pathname = usePathname()
   const { user } = useUser()
+  const { logout } = useAuth()
   const isExpert = user.role.name === 'expert'
   const menuItems = isExpert ? expertMenuItems : userMenuItems
 
@@ -100,6 +117,7 @@ export function SidebarNav({ className, ...props }: SidebarNavProps) {
           Settings
         </Link>
         <button
+          onClick={logout}
           className={cn(
             buttonVariants({ variant: "ghost" }),
             "justify-start gap-3 py-6 md:py-2",
